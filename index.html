@@ -26,6 +26,7 @@
   --sh-xl:0 20px 25px -5px rgb(15 23 42 / .10),0 8px 10px -6px rgb(15 23 42 / .10);
 }
 *{margin:0;padding:0;box-sizing:border-box;}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 html,body{height:100%;background:var(--ink);overflow:hidden;}
 body{font-family:var(--body);color:var(--ink);font-feature-settings:'cv11','ss01';}
 
@@ -89,6 +90,12 @@ ul.clean.ember-dots li::before{background:var(--pine-soft);}
 
 .ownp{font-size:16px;color:var(--mut);max-width:840px;line-height:1.6;margin-bottom:26px;}
 .ownp b{color:var(--ink);font-weight:600;}
+
+/* ---------- QR ---------- */
+.qr{position:absolute;top:54px;right:72px;display:flex;flex-direction:column;align-items:center;gap:9px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 14px 11px;box-shadow:var(--sh-md);z-index:4;}
+.qr img{width:104px;height:104px;image-rendering:pixelated;display:block;}
+.qr span{font-family:var(--mono);font-size:9.5px;font-weight:500;color:var(--soft);letter-spacing:.01em;}
+.qr.big img{width:148px;height:148px;}
 
 /* ---------- Slide 1 ---------- */
 #s1{display:flex;flex-direction:column;justify-content:center;padding-top:40px;}
@@ -211,6 +218,7 @@ ul.clean.ember-dots li::before{background:var(--pine-soft);}
 <section class="slide" id="s1" data-time="30 sek">
   <div class="blob" style="top:-280px;right:-220px;"></div>
   <div class="blob" style="bottom:-340px;left:-280px;opacity:.14;"></div>
+  <div class="qr"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAAZAQMAAAD+JxcgAAAABlBMVEUAAAD///+l2Z/dAAAAAnRSTlP//8i138cAAAAJcEhZcwAACxIAAAsSAdLdfvwAAAB7SURBVAiZY2CUPFDPUBseX8/guvkikNgAImIDgWLiQDHGUId6hv8x9f8ZJFnZ6hl2LeKqZ0jJigSy1hj/Z/i43L+eYZKSXz2DrUdlPcO1bcn/GUyms/1n+K9dDtR7PhxoSmgZ0Lxl7P8ZXJdsARJaSkAxX/f/DIz+0fUACHQtt+adpcQAAAAASUVORK5CYII=" alt="QR-kode til presentasjonen" width="25" height="25"><span>kulia.no/ai-house-case</span></div>
   <div class="kicker"><span class="sq"></span>Case · Daglig leder · Et initiativ fra Oxidane Venture</div>
   <h1 class="h-xl">Agders<br><em>neste bølge</em></h1>
   <p class="sub">Hos eierne starter alt med vann. Jeg tror det neste som løfter Agder, er <strong>kunstig intelligens i produksjon</strong> — og dette caset viser hvordan jeg vil bygge huset som får det til.</p>
@@ -519,6 +527,7 @@ ul.clean.ember-dots li::before{background:var(--pine-soft);}
 <!-- ============ SLIDE 15 · TAKK ============ -->
 <section class="slide" id="s15" data-time="15 sek">
   <div class="blob" style="top:-300px;right:-260px;opacity:.16;"></div>
+  <div class="qr big" style="top:50%;transform:translateY(-50%);"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAAZAQMAAAD+JxcgAAAABlBMVEUAAAD///+l2Z/dAAAAAnRSTlP//8i138cAAAAJcEhZcwAACxIAAAsSAdLdfvwAAAB7SURBVAiZY2CUPFDPUBseX8/guvkikNgAImIDgWLiQDHGUId6hv8x9f8ZJFnZ6hl2LeKqZ0jJigSy1hj/Z/i43L+eYZKSXz2DrUdlPcO1bcn/GUyms/1n+K9dDtR7PhxoSmgZ0Lxl7P8ZXJdsARJaSkAxX/f/DIz+0fUACHQtt+adpcQAAAAASUVORK5CYII=" alt="QR-kode til presentasjonen" width="25" height="25"><span>kulia.no/ai-house-case</span></div>
   <div style="display:flex;flex-direction:column;justify-content:center;height:100%;padding-bottom:30px;">
     <div class="kicker"><span class="sq"></span>Takk</div>
     <h1 class="h-xl">Skal vi ta<br>en kaffe?</h1>
@@ -555,10 +564,14 @@ ul.clean.ember-dots li::before{background:var(--pine-soft);}
 
   /* ---- scale stage to viewport ---- */
   function fit(){
-    var s=Math.min(window.innerWidth/1280, window.innerHeight/720);
-    stage.style.transform='scale('+s+')';
+    var vv=window.visualViewport;
+    var w=vv?vv.width:window.innerWidth, h=vv?vv.height:window.innerHeight;
+    stage.style.transform='scale('+Math.min(w/1280,h/720)+')';
   }
-  window.addEventListener('resize',fit); fit();
+  window.addEventListener('resize',fit);
+  window.addEventListener('orientationchange',fit);
+  if(window.visualViewport){window.visualViewport.addEventListener('resize',fit);}
+  fit();
 
   /* ---- instrument bar: 15 ticks, 5 question markers ---- */
   var inst=document.getElementById('instrument');
