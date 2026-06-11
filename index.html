@@ -32,7 +32,7 @@ body{font-family:var(--body);color:var(--ink);font-feature-settings:'cv11','ss01
 
 /* ---------- Stage ---------- */
 #viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;}
-#stage{position:relative;width:1280px;height:720px;background:var(--paper);transform-origin:center center;box-shadow:0 0 80px rgba(0,0,0,.5);overflow:hidden;}
+#stage{position:relative;flex:none;width:1280px;height:720px;background:var(--paper);transform-origin:center center;box-shadow:0 0 80px rgba(0,0,0,.5);overflow:hidden;}
 
 /* ---------- Slides ---------- */
 .slide{position:absolute;inset:0;padding:54px 72px 110px;opacity:0;visibility:hidden;transform:translateY(14px);transition:opacity .45s ease,transform .45s ease,visibility .45s;}
@@ -42,7 +42,7 @@ body{font-family:var(--body);color:var(--ink);font-feature-settings:'cv11','ss01
 /* Tailwind-blob (dekor) */
 .blob{position:absolute;width:740px;height:740px;filter:blur(72px);opacity:.20;pointer-events:none;background:linear-gradient(120deg,#22d3ee 0%,#0284c7 55%,#6366f1 100%);clip-path:polygon(63% 2%,98% 24%,86% 64%,52% 98%,16% 78%,2% 34%,28% 8%);}
 
-.kicker{display:inline-flex;align-items:center;gap:8px;background:#ecfeff;color:#0e7490;border:1px solid rgba(8,145,178,.22);border-radius:9999px;padding:6px 14px;font-size:12.5px;font-weight:600;letter-spacing:.01em;margin-bottom:24px;}
+.kicker{display:inline-flex;align-self:flex-start;align-items:center;gap:8px;background:#ecfeff;color:#0e7490;border:1px solid rgba(8,145,178,.22);border-radius:9999px;padding:6px 14px;font-size:12.5px;font-weight:600;letter-spacing:.01em;margin-bottom:24px;}
 .kicker .sq{width:7px;height:7px;background:var(--ember);display:inline-block;border-radius:9999px;}
 h1{font-weight:800;letter-spacing:-.03em;line-height:1.04;color:var(--ink);}
 .h-xl{font-size:80px;}
@@ -92,7 +92,7 @@ ul.clean.ember-dots li::before{background:var(--pine-soft);}
 .ownp b{color:var(--ink);font-weight:600;}
 
 /* ---------- QR ---------- */
-.qr{position:absolute;top:54px;right:72px;display:flex;flex-direction:column;align-items:center;gap:9px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 14px 11px;box-shadow:var(--sh-md);z-index:4;}
+.qr{position:absolute;top:50%;right:72px;transform:translateY(-50%);display:flex;flex-direction:column;align-items:center;gap:9px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 14px 11px;box-shadow:var(--sh-md);z-index:4;}
 .qr img{width:104px;height:104px;image-rendering:pixelated;display:block;}
 .qr span{font-family:var(--mono);font-size:9.5px;font-weight:500;color:var(--soft);letter-spacing:.01em;}
 .qr.big img{width:148px;height:148px;}
@@ -527,7 +527,7 @@ ul.clean.ember-dots li::before{background:var(--pine-soft);}
 <!-- ============ SLIDE 15 · TAKK ============ -->
 <section class="slide" id="s15" data-time="15 sek">
   <div class="blob" style="top:-300px;right:-260px;opacity:.16;"></div>
-  <div class="qr big" style="top:50%;transform:translateY(-50%);"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAAZAQMAAAD+JxcgAAAABlBMVEUAAAD///+l2Z/dAAAAAnRSTlP//8i138cAAAAJcEhZcwAACxIAAAsSAdLdfvwAAAB7SURBVAiZY2CUPFDPUBseX8/guvkikNgAImIDgWLiQDHGUId6hv8x9f8ZJFnZ6hl2LeKqZ0jJigSy1hj/Z/i43L+eYZKSXz2DrUdlPcO1bcn/GUyms/1n+K9dDtR7PhxoSmgZ0Lxl7P8ZXJdsARJaSkAxX/f/DIz+0fUACHQtt+adpcQAAAAASUVORK5CYII=" alt="QR-kode til presentasjonen" width="25" height="25"><span>kulia.no/ai-house-case</span></div>
+  <div class="qr big"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAAZAQMAAAD+JxcgAAAABlBMVEUAAAD///+l2Z/dAAAAAnRSTlP//8i138cAAAAJcEhZcwAACxIAAAsSAdLdfvwAAAB7SURBVAiZY2CUPFDPUBseX8/guvkikNgAImIDgWLiQDHGUId6hv8x9f8ZJFnZ6hl2LeKqZ0jJigSy1hj/Z/i43L+eYZKSXz2DrUdlPcO1bcn/GUyms/1n+K9dDtR7PhxoSmgZ0Lxl7P8ZXJdsARJaSkAxX/f/DIz+0fUACHQtt+adpcQAAAAASUVORK5CYII=" alt="QR-kode til presentasjonen" width="25" height="25"><span>kulia.no/ai-house-case</span></div>
   <div style="display:flex;flex-direction:column;justify-content:center;height:100%;padding-bottom:30px;">
     <div class="kicker"><span class="sq"></span>Takk</div>
     <h1 class="h-xl">Skal vi ta<br>en kaffe?</h1>
