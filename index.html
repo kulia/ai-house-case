@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI House · Case daglig leder · Geir Kulia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#f8fafc;        /* slate-50 */
+  --ink:#0f172a;          /* slate-900 */
+  --pine:#0e7490;         /* cyan-700 */
+  --pine-soft:#0891b2;    /* cyan-600 */
+  --ember:#06b6d4;        /* cyan-500 */
+  --line:#e2e8f0;         /* slate-200 */
+  --mut:#475569;          /* slate-600 */
+  --soft:#64748b;         /* slate-500 */
+  --faint:#94a3b8;        /* slate-400 */
+  --card:#ffffff;
+  --body:'Inter',ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:ui-monospace,'SFMono-Regular',Menlo,Consolas,monospace;
+  --sh-sm:0 1px 2px 0 rgb(15 23 42 / .05);
+  --sh-md:0 4px 6px -1px rgb(15 23 42 / .08),0 2px 4px -2px rgb(15 23 42 / .08);
+  --sh-xl:0 20px 25px -5px rgb(15 23 42 / .10),0 8px 10px -6px rgb(15 23 42 / .10);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;background:var(--ink);overflow:hidden;}
+body{font-family:var(--body);color:var(--ink);font-feature-settings:'cv11','ss01';}
+
+/* ---------- Stage ---------- */
+#viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;}
+#stage{position:relative;width:1280px;height:720px;background:var(--paper);transform-origin:center center;box-shadow:0 0 80px rgba(0,0,0,.5);overflow:hidden;}
+
+/* ---------- Slides ---------- */
+.slide{position:absolute;inset:0;padding:54px 72px 110px;opacity:0;visibility:hidden;transform:translateY(14px);transition:opacity .45s ease,transform .45s ease,visibility .45s;}
+.slide.active{opacity:1;visibility:visible;transform:translateY(0);}
+.notes{display:none;}
+
+/* Tailwind-blob (dekor) */
+.blob{position:absolute;width:740px;height:740px;filter:blur(72px);opacity:.20;pointer-events:none;background:linear-gradient(120deg,#22d3ee 0%,#0284c7 55%,#6366f1 100%);clip-path:polygon(63% 2%,98% 24%,86% 64%,52% 98%,16% 78%,2% 34%,28% 8%);}
+
+.kicker{display:inline-flex;align-items:center;gap:8px;background:#ecfeff;color:#0e7490;border:1px solid rgba(8,145,178,.22);border-radius:9999px;padding:6px 14px;font-size:12.5px;font-weight:600;letter-spacing:.01em;margin-bottom:24px;}
+.kicker .sq{width:7px;height:7px;background:var(--ember);display:inline-block;border-radius:9999px;}
+h1{font-weight:800;letter-spacing:-.03em;line-height:1.04;color:var(--ink);}
+.h-xl{font-size:80px;}
+.h-lg{font-size:50px;}
+.h-md{font-size:38px;}
+.sub{font-size:18px;color:var(--mut);max-width:780px;margin-top:18px;line-height:1.6;}
+.sub strong{color:var(--ink);font-weight:600;}
+em{font-style:normal;color:var(--pine-soft);}
+.ember{color:var(--pine-soft);}
+.mono{font-family:var(--mono);}
+
+/* ---------- Chrome: footer + fremdrift ---------- */
+#chrome{position:absolute;left:0;right:0;bottom:0;height:96px;padding:0 72px;pointer-events:none;}
+#instrument{position:absolute;left:72px;right:72px;bottom:52px;height:30px;}
+#instrument .rail{position:absolute;left:0;right:0;top:13px;height:3px;background:var(--line);border-radius:9999px;}
+.tick{position:absolute;top:12px;width:5px;height:5px;border-radius:9999px;background:#cbd5e1;transform:translateX(-2.5px);}
+.tick.major{top:10px;width:9px;height:9px;background:var(--faint);}
+.tick.done{background:var(--ember);}
+.tick.now{background:var(--pine-soft);width:11px;height:11px;top:9px;box-shadow:0 0 0 4px rgba(6,182,212,.22);}
+.tick-label{position:absolute;top:-15px;transform:translateX(-50%);font-size:10px;font-weight:600;letter-spacing:.06em;color:var(--faint);}
+#meta{position:absolute;left:72px;right:72px;bottom:18px;display:flex;justify-content:space-between;font-size:11.5px;font-weight:500;letter-spacing:.02em;color:var(--faint);font-variant-numeric:tabular-nums;}
+#meta b{color:var(--soft);font-weight:600;}
+
+/* ---------- Kort & grid ---------- */
+.grid{display:grid;gap:16px;}
+.cols-2{grid-template-columns:1fr 1fr;}
+.cols-3{grid-template-columns:1fr 1fr 1fr;}
+.cols-4{grid-template-columns:repeat(4,1fr);}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px 22px;box-shadow:var(--sh-sm);}
+.card h3{font-weight:700;font-size:17px;letter-spacing:-.01em;margin-bottom:8px;}
+.card p{font-size:14px;line-height:1.55;color:var(--mut);}
+.card p b{color:var(--ink);font-weight:600;}
+.num{font-size:34px;font-weight:700;color:var(--pine-soft);line-height:1;margin-bottom:10px;letter-spacing:-.02em;font-variant-numeric:tabular-nums;}
+.num.ember{color:var(--pine);}
+.lab{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--soft);margin-bottom:10px;}
+.footline{font-size:13px;color:var(--soft);border-top:1px solid var(--line);padding-top:14px;margin-top:26px;}
+.footline b{color:var(--ink);font-weight:600;}
+
+ul.clean{list-style:none;}
+ul.clean li{padding-left:22px;position:relative;font-size:15.5px;line-height:1.55;margin-bottom:11px;color:var(--ink);}
+ul.clean li::before{content:"";position:absolute;left:0;top:8px;width:7px;height:7px;background:var(--ember);border-radius:9999px;}
+ul.clean li b{font-weight:600;}
+ul.clean li span{color:var(--mut);}
+ul.clean.ember-dots li::before{background:var(--pine-soft);}
+
+.ownp{font-size:16px;color:var(--mut);max-width:840px;line-height:1.6;margin-bottom:26px;}
+.ownp b{color:var(--ink);font-weight:600;}
+
+/* ---------- Slide 1 ---------- */
+#s1{display:flex;flex-direction:column;justify-content:center;padding-top:40px;}
+.byline{margin-top:30px;font-size:14px;font-weight:500;color:var(--ink);}
+.byline span{color:var(--soft);font-weight:400;}
+
+/* ---------- Faser ---------- */
+.phase{border-top:3px solid var(--pine-soft);padding-top:16px;}
+.phase.p2{border-color:#0ea5e9;}
+.phase .when{font-size:11px;font-weight:600;letter-spacing:.08em;color:var(--soft);text-transform:uppercase;}
+.phase h3{font-size:30px;font-weight:800;letter-spacing:-.02em;margin:6px 0 10px;}
+.phase p{font-size:15px;color:var(--mut);line-height:1.55;}
+.quote{font-size:17px;color:var(--mut);border-left:4px solid var(--line);padding-left:18px;margin-bottom:34px;max-width:880px;line-height:1.6;}
+.quote b{color:var(--ink);font-weight:600;}
+
+/* ---------- Kaffe-grid ---------- */
+.coffee{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:26px;}
+.coffee .card{padding:16px 18px;border-radius:12px;}
+.coffee h3{font-size:15px;}
+.coffee p{font-size:13px;}
+.coffee .ix{font-size:11px;font-weight:700;color:var(--pine-soft);letter-spacing:.04em;margin-bottom:6px;display:block;font-variant-numeric:tabular-nums;}
+
+/* ---------- Posisjonskart ---------- */
+.posmap{display:grid;grid-template-columns:1fr 300px 1fr;gap:18px;align-items:stretch;margin-top:10px;}
+.hub{border:1px solid var(--line);background:var(--card);border-radius:16px;box-shadow:var(--sh-md);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:26px 20px;}
+.hubmark{font-weight:800;font-size:26px;letter-spacing:-.02em;display:flex;align-items:center;gap:9px;}
+.hubmark::before{content:"";width:10px;height:10px;border-radius:9999px;background:var(--ember);}
+.hub p{font-size:13.5px;color:var(--mut);margin-top:10px;line-height:1.5;}
+.satcol{display:flex;flex-direction:column;gap:14px;justify-content:center;}
+.sat{border:1px solid var(--line);background:var(--card);border-radius:12px;padding:14px 16px;box-shadow:var(--sh-sm);}
+.sat h4{font-weight:700;font-size:15px;letter-spacing:-.01em;}
+.sat p{font-size:13px;color:var(--mut);margin-top:3px;}
+
+/* ---------- Årshjul ---------- */
+.year{position:relative;margin-top:46px;}
+.year .rail{height:3px;background:var(--line);position:absolute;left:0;right:0;top:0;border-radius:9999px;}
+.qrow{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;}
+.q{padding-top:24px;position:relative;}
+.q::before{content:"";position:absolute;top:-6px;left:0;width:14px;height:14px;background:var(--pine-soft);border-radius:9999px;border:3px solid var(--paper);box-shadow:0 0 0 1px var(--line);}
+.q.last::before{background:#0ea5e9;}
+.q .when{font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--pine-soft);text-transform:uppercase;}
+.q.last .when{color:#0284c7;}
+.q h3{font-size:19px;font-weight:700;letter-spacing:-.01em;margin:8px 0 10px;}
+.q li{font-size:13px;margin-bottom:7px;padding-left:16px;}
+.q li::before{width:6px;height:6px;top:7px;}
+
+/* ---------- Fem grep / kompass ---------- */
+.moves{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-top:24px;}
+.move{border:1px solid var(--line);background:var(--card);border-radius:12px;padding:18px 16px;display:flex;flex-direction:column;box-shadow:var(--sh-sm);}
+.move .n{font-size:11px;font-weight:700;color:var(--pine-soft);letter-spacing:.06em;margin-bottom:10px;font-variant-numeric:tabular-nums;}
+.move h3{font-size:15.5px;font-weight:700;letter-spacing:-.01em;line-height:1.2;margin-bottom:10px;min-height:38px;}
+.move p{font-size:12.5px;line-height:1.5;color:var(--mut);}
+.move p b{color:var(--ink);}
+
+/* ---------- KPI ---------- */
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:24px;}
+.kpi{border:1px solid var(--line);background:var(--card);border-radius:12px;padding:18px;box-shadow:var(--sh-sm);}
+.kpi .num{font-size:30px;margin-bottom:6px;}
+.kpi p{font-size:13px;color:var(--mut);line-height:1.5;}
+.truth{margin-top:24px;background:var(--ink);color:#cbd5e1;border:1px solid var(--ink);border-radius:16px;padding:18px 22px;font-size:16.5px;}
+.truth b{color:#67e8f9;font-weight:600;}
+
+/* ---------- Nettside-preview ---------- */
+.preview-wrap{display:grid;grid-template-columns:1.05fr .95fr;gap:34px;align-items:center;}
+.browser{border:1px solid var(--line);border-radius:12px;background:#fff;box-shadow:var(--sh-xl);overflow:hidden;}
+.browser .bar{display:flex;align-items:center;gap:8px;background:#f8fafc;border-bottom:1px solid var(--line);padding:9px 12px;}
+.browser .dot{width:9px;height:9px;border-radius:9999px;background:#cbd5e1;}
+.browser .url{font-family:var(--mono);font-size:10.5px;color:var(--soft);background:#fff;border:1px solid var(--line);border-radius:6px;padding:3px 10px;margin-left:6px;}
+.bpage{padding:18px 20px;}
+.bnav{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+.bnav .bm{font-weight:800;font-size:14px;letter-spacing:-.01em;display:flex;align-items:center;gap:6px;}
+.bnav .bm::before{content:"";width:7px;height:7px;border-radius:9999px;background:var(--ember);}
+.bnav .links{font-size:9.5px;font-weight:500;color:var(--soft);}
+.bhero h2{font-size:23px;font-weight:800;letter-spacing:-.02em;line-height:1.08;}
+.bhero .bk{font-size:9px;font-weight:700;letter-spacing:.1em;color:var(--pine-soft);text-transform:uppercase;margin-bottom:6px;}
+.bhero p{font-size:11px;color:var(--mut);margin:8px 0 12px;line-height:1.5;}
+.bbtn{display:inline-block;font-size:9.5px;font-weight:600;padding:7px 12px;border-radius:6px;}
+.bbtn.solid{background:var(--pine-soft);color:#fff;margin-right:8px;box-shadow:var(--sh-sm);}
+.bbtn.ghost{border:1px solid #cbd5e1;color:#334155;background:#fff;}
+.bcards{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px;}
+.bcard{border:1px solid var(--line);border-radius:8px;padding:10px;}
+.bcard h5{font-size:11px;font-weight:700;letter-spacing:-.005em;}
+.bcard p{font-size:9px;color:var(--mut);margin-top:4px;line-height:1.45;}
+.bcard .bdot{width:6px;height:6px;background:var(--ember);margin-bottom:6px;border-radius:9999px;}
+
+/* ---------- Notatpanel ---------- */
+#notesPanel{position:absolute;left:0;right:0;bottom:0;background:rgba(15,23,42,.97);color:#cbd5e1;padding:26px 72px 30px;transform:translateY(100%);transition:transform .3s ease;max-height:46%;overflow:auto;border-top:1px solid rgba(255,255,255,.12);}
+#notesPanel.open{transform:translateY(0);}
+#notesPanel .nt{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#22d3ee;margin-bottom:12px;}
+#notesPanel .nb{font-size:15px;line-height:1.65;max-width:980px;}
+#notesPanel .nb b{color:#fff;}
+
+/* ---------- Hint & nav ---------- */
+#hint{position:absolute;left:72px;bottom:18px;font-size:11.5px;font-weight:500;color:var(--faint);opacity:1;transition:opacity 1s;z-index:5;background:var(--paper);padding-right:10px;}
+#hint.faded{opacity:0;}
+#navBtns{position:absolute;right:24px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:8px;z-index:6;}
+#navBtns button{width:36px;height:36px;border:1px solid var(--line);background:var(--card);color:var(--mut);font-size:15px;cursor:pointer;border-radius:10px;box-shadow:var(--sh-sm);}
+#navBtns button:hover{border-color:var(--ember);color:var(--pine-soft);}
+:focus-visible{outline:2px solid var(--ember);outline-offset:2px;}
+
+@media (prefers-reduced-motion:reduce){
+  .slide{transition:none;}
+}
+
+/* ---------- Print ---------- */
+@media print{
+  html,body{overflow:visible;background:#fff;}
+  #viewport{position:static;display:block;}
+  #stage{transform:none!important;width:1280px;height:auto;box-shadow:none;overflow:visible;}
+  .slide{position:relative;opacity:1;visibility:visible;transform:none;height:720px;page-break-after:always;border-bottom:1px solid #ddd;}
+  #chrome,#hint,#navBtns,#notesPanel,.blob{display:none!important;}
+}
+</style>
+</head>
+<body>
+<div id="viewport">
+<div id="stage">
+
+<!-- ============ SLIDE 1 · TITTEL ============ -->
+<section class="slide" id="s1" data-time="30 sek">
+  <div class="blob" style="top:-280px;right:-220px;"></div>
+  <div class="blob" style="bottom:-340px;left:-280px;opacity:.14;"></div>
+  <div class="kicker"><span class="sq"></span>Case · Daglig leder · Et initiativ fra Oxidane Venture</div>
+  <h1 class="h-xl">Agders<br><em>neste bølge</em></h1>
+  <p class="sub">Hos eierne starter alt med vann. Jeg tror det neste som løfter Agder, er <strong>kunstig intelligens i produksjon</strong> — og dette caset viser hvordan jeg vil bygge huset som får det til.</p>
+  <div class="byline">Geir Kulia <span>· Lillesand · geir@kulia.no</span></div>
+  <aside class="notes"><b>Åpning (30 sek).</b> Takk for casen — og for formuleringen «det finnes ingen fasit». Åpningsreplikk: «Hos Oxidane starter alt med vann. Jeg tror Agders neste bølge er intelligens — og det huset vil jeg gjerne bygge.» Fem spørsmål, femten minutter. Vannstanden nederst viser hvor vi er.</aside>
+</section>
+
+<!-- ============ SLIDE 2 · UTGANGSPUNKTET ============ -->
+<section class="slide" data-time="45 sek">
+  <div class="kicker"><span class="sq"></span>Hvorfor jeg står her</div>
+  <h1 class="h-lg">Jeg har solgt teknologi til<br>industrien i Agder i ti år</h1>
+  <p class="sub">Grunnla Signal Analysis Lab i 2016. Bygget en industriell sensorplattform fra idé til drift — og lærte hva som faktisk skal til for at tung industri tar ny teknologi i bruk.</p>
+  <div class="grid cols-4" style="margin-top:30px;">
+    <div class="card"><div class="num">20 anlegg</div><p><b>3 land.</b> Plattformen overvåker i dag 15&nbsp;% av europeisk kapasitet innen silisiumlegering.</p></div>
+    <div class="card"><div class="num">12 000+</div><p><b>maskiner globalt</b> kjører tilstandsovervåkingen vi solgte til Moreld i 2019.</p></div>
+    <div class="card"><div class="num">65 %</div><p><b>bruttomargin</b> etter skiftet fra maskinvaresalg til Measurement-as-a-Service.</p></div>
+    <div class="card"><div class="num ember">AI i drift</div><p><b>MCP-integrasjon:</b> naturlig språk rett mot sensordata — i produksjon hos kunder i dag.</p></div>
+  </div>
+  <div class="footline">Kunder: <b>Elkem · Vianode · Boliden · Wacker · Finnfjord · Amiblu</b> &nbsp;·&nbsp; DN 40 under 40 &nbsp;·&nbsp; 8 fagfellevurderte publikasjoner &nbsp;·&nbsp; Ekstern sensor, NTNU</div>
+  <aside class="notes"><b>Poenget:</b> Jeg kommer ikke til AI House med teori. Jeg har gjort hele reisen — utviklet, solgt, pivotert, divestert og driftet — mot nøyaktig de bedriftene AI House skal tjene. AI-laget vi bygde er ikke en demo; det står i produksjon. <b>Si kort:</b> «Elkem og Vianode er Eyde-bedrifter. Jeg kjenner kjøperne i denne regionen fra fabrikkgulv til konsernledelse.»</aside>
+</section>
+
+<!-- ============ SLIDE 3 · SLIK LESER JEG OPPDRAGET ============ -->
+<section class="slide" data-time="45 sek">
+  <div class="kicker"><span class="sq"></span>Slik leser jeg oppdraget</div>
+  <p class="quote">Dere skriver det selv: rammene og ambisjonene er definert, finansiering og partnere er på plass — men <b>formen, rollen og det største verdibidraget skal finnes.</b> Da er metoden viktigere enn fasiten.</p>
+  <h1 class="h-md" style="margin-bottom:34px;">Lytte. Levere. Bygge.</h1>
+  <div class="grid cols-3">
+    <div class="phase"><div class="when">Dag 1–30</div><h3>Lytte</h3><p>Forstå de reelle behovene før strategien låses. Hypoteser med meg inn — ikke ferdige svar.</p></div>
+    <div class="phase p2"><div class="when">Måned 2–12</div><h3>Levere</h3><p>Synlig verdi raskt. Vis, ikke fortell — momentum bygges av ting som virker, ikke planer.</p></div>
+    <div class="phase"><div class="when">Hele tiden</div><h3>Bygge</h3><p>Struktur, partnerskap og økonomi som varer lenger enn oppstarts&shy;entusiasmen.</p></div>
+  </div>
+  <aside class="notes"><b>Rammen for alt som kommer.</b> Tre verb, i prioritert rekkefølge. Strategien skal utvikles <b>sammen med styret</b> — min jobb de første ukene er å skaffe beslutningsgrunnlaget. Resten av presentasjonen følger de fem spørsmålene deres — se skalaen nederst.</aside>
+</section>
+
+<!-- ============ SLIDE 4 · Q1: 30 DAGER ============ -->
+<section class="slide" data-time="75 sek">
+  <div class="kicker"><span class="sq"></span>Spørsmål 1 · De første 30 dagene</div>
+  <h1 class="h-lg">Først: kaffe. Mye kaffe.</h1>
+  <p class="sub"><strong>50 samtaler på 30 dager.</strong> Jeg snakker mer enn gjerne — men de første ukene lytter jeg.</p>
+  <div class="coffee">
+    <div class="card"><span class="ix">01 · UKE 1</span><h3>Styret &amp; Oxidane</h3><p>Forventninger, rammer, økonomi — og hva partnerne allerede er lovet.</p></div>
+    <div class="card"><span class="ix">02</span><h3>Partnerne som er inne</h3><p>Hva har de kjøpt, hva trenger de, hva vil gjøre dem til ambassadører?</p></div>
+    <div class="card"><span class="ix">03</span><h3>20+ bedrifter</h3><p>Industri og SMB. Hvor er den reelle smerten — og hva har de prøvd?</p></div>
+    <div class="card"><span class="ix">04</span><h3>Klyngene</h3><p>Eyde, GCE NODE, Digin. Hva finnes allerede — hva mangler faktisk?</p></div>
+    <div class="card"><span class="ix">05</span><h3>UiA</h3><p>CAIR, Mechatronics Innovation Lab og studentmiljøet i Grimstad.</p></div>
+    <div class="card"><span class="ix">06</span><h3>Offentlig sektor</h3><p>Fylkeskommunen, kommunene, Innovasjon Norge — behov og virkemidler.</p></div>
+    <div class="card"><span class="ix">07</span><h3>De som har lyktes</h3><p>Investormiljø og gründere: hva trengte dere — og hva sto i veien?</p></div>
+    <div class="card"><span class="ix">08</span><h3>Media</h3><p>Bygge relasjonene før vi trenger dem. Historiene kommer.</p></div>
+  </div>
+  <aside class="notes"><b>Q1 — kjernen i svaret.</b> Lyttingen er strukturert, ikke koselig: samme intervjuguide til alle, alt logges i CRM fra dag én. Trekk frem gruppe 07 spesielt — å intervjue de som faktisk har lyktes med AI og selskapsbygging i regionen er den raskeste veien til å forstå hva AI House må tilby. <b>UiA-hook:</b> studentmiljøet i Grimstad arrangerte nettopp NM i kunstig intelligens — det er råstoff vi skal koble på bedriftene.</aside>
+</section>
+
+<!-- ============ SLIDE 5 · Q1: LEVERANSER ============ -->
+<section class="slide" data-time="60 sek">
+  <div class="kicker"><span class="sq"></span>Spørsmål 1 · Hva jeg vil lære — og levere</div>
+  <h1 class="h-md">Etter 30 dager ligger dette på bordet</h1>
+  <div class="grid cols-2" style="margin-top:30px;">
+    <div>
+      <div class="lab">Tre spørsmål jeg vil ha svar på</div>
+      <ul class="clean">
+        <li><b>Hvor er den reelle smerten?</b><br><span>Hva hindrer bedriftene i Agder i å ta AI i bruk — kompetanse, data, tid eller tillit?</span></li>
+        <li><b>Hva finnes allerede — og hva mangler?</b><br><span>AI House skal fylle hull, ikke duplisere klynger, akademia eller konsulenter.</span></li>
+        <li><b>Hvem er villig til å betale for hva?</b><br><span>Non-profit betyr ikke gratis. Bærekraftig drift krever betalingsvilje.</span></li>
+      </ul>
+    </div>
+    <div>
+      <div class="lab">Leveranser · dag 30</div>
+      <ul class="clean ember-dots">
+        <li><b>Behovskart for Agder</b> <span>— systematisert fra 50 samtaler</span></li>
+        <li><b>Posisjonsnotat og strategiutkast</b> <span>— utarbeidet sammen med styret</span></li>
+        <li><b>Tre quick wins igangsatt</b> <span>— første AI House Live booket, ny nettside live, LinkedIn i gang</span></li>
+        <li><b>De første navnene til Advisory Board</b></li>
+        <li><b>90-dagersplan</b> <span>— med målbare milepæler</span></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footline">Jeg kommer med hypoteser — <b>fasiten lager vi sammen med styret og markedet.</b></div>
+  <aside class="notes"><b>Q1 avsluttes med leveranser, ikke aktiviteter.</b> Lytting uten output er bare kaffe. Quick wins-poenget: synlighet fra uke én koster lite og signaliserer tempo. Nettsiden — den kommer jeg tilbake til, den trenger ikke vente på et byrå.</aside>
+</section>
+
+<!-- ============ SLIDE 6 · Q2: KJENT FOR ============ -->
+<section class="slide" data-time="60 sek">
+  <div class="kicker"><span class="sq"></span>Spørsmål 2 · Hva AI House bør være kjent for</div>
+  <h1 class="h-lg">Stedet der Agder går fra<br><em>AI-nysgjerrig</em> til <em>AI i produksjon</em></h1>
+  <p class="sub">Ikke enda en møteplass. <strong>Et verksted.</strong> Tre løfter som skal gå igjen i alt vi gjør:</p>
+  <div class="grid cols-3" style="margin-top:28px;">
+    <div class="card"><h3>Praktisk</h3><p>Ekte problemer, ekte data, fungerende løsninger. Ikke foredrag om fremtiden — <b>demoer fra forrige uke.</b></p></div>
+    <div class="card"><h3>Målbart</h3><p>Hvert prosjekt dokumenterer effekt: <b>timer spart, kvalitet hevet, kroner tjent.</b> Det vi ikke kan måle, lover vi ikke.</p></div>
+    <div class="card"><h3>Åpent</h3><p>Én dør inn for alle: konsernet, SMB-en, kommunen og studenten. <b>Anvendt KI for hele Agder</b> — som mandatet sier.</p></div>
+  </div>
+  <aside class="notes"><b>Q2 — posisjonen i én setning.</b> «Fra AI-nysgjerrig til AI i produksjon» er testbar: enten har en bedrift fått noe i drift gjennom oss, eller ikke. Møteplasser finnes det mange av; et sted som hjelper deg helt frem til produksjon, finnes ikke i regionen. Det er hullet AI House skal eie.</aside>
+</section>
+
+<!-- ============ SLIDE 7 · Q2: ROLLEN ============ -->
+<section class="slide" data-time="60 sek">
+  <div class="kicker"><span class="sq"></span>Spørsmål 2 · Rollen i økosystemet</div>
+  <h1 class="h-md" style="margin-bottom:26px;">Komplement — ikke konkurrent</h1>
+  <div class="posmap">
+    <div class="satcol">
+      <div class="sat"><h4>Klyngene</h4><p>Eyde, GCE NODE, Digin — har bransjene og medlemmene</p></div>
+      <div class="sat"><h4>UiA / CAIR</h4><p>Har forskningen, laben og studentene</p></div>
+      <div class="sat"><h4>Innoventus Sør</h4><p>Har inkubasjonen og oppstartsløpene</p></div>
+    </div>
+    <div class="hub">
+      <div class="hubmark">AI House</div>
+      <p><b>Døren inn.</b> Binder miljøene sammen — og hjelper bedrifter som ikke vet hvor de skal begynne.</p>
+    </div>
+    <div class="satcol">
+      <div class="sat"><h4>Offentlig sektor</h4><p>Har behovene, dataene og virkemidlene</p></div>
+      <div class="sat"><h4>Investormiljøet</h4><p>Har kapitalen og selskapsbygger&shy;erfaringen</p></div>
+      <div class="sat"><h4>Konsulentene</h4><p>Har leveransekapasitet — vi sender dem modne kunder</p></div>
+    </div>
+  </div>
+  <div class="footline">Og tidsvinduet er nå: <b>EUs KI-forordning er på vei inn i norsk rett.</b> Bedriftene vil trenge ett sted å spørre — det stedet bør hete AI House.</div>
+  <aside class="notes"><b>Forkjøpsrett på innvendingen:</b> «Trenger Agder enda en aktør?» Svaret er at AI House ikke tar noens rolle — vi gjør de andre bedre og sender dem kvalifiserte kunder. Det gjør oss lette å samarbeide med, og umulige å være imot. AI Act-poenget gir aktualitet uten skremsel.</aside>
+</section>
+
+<!-- ============ SLIDE 7B · Q2: EIERNES KOMPASS ============ -->
+<section class="slide" data-time="45 sek">
+  <div class="kicker"><span class="sq"></span>Spørsmål 2 · Forankring hos eier</div>
+  <h1 class="h-md" style="margin-bottom:14px;">Bygget på eiernes eget kompass</h1>
+  <p class="ownp">Oxidane investerer etter fem kriterier. <b>Jeg vil drive AI House etter de samme</b> — da blir huset lett å eie, lett å styre og lett å finansiere.</p>
+  <div class="moves">
+    <div class="move"><div class="n">01</div><h3>Eksepsjonelt team</h3><p>Ansettelser, advisory board og frivillige hentes fra regionens beste miljøer. <b>Mennesker først</b> — som hos dere.</p></div>
+    <div class="move"><div class="n">02</div><h3>Blue shift</h3><p>Impact er målet: AI som kutter <b>energi, utslipp og ressursbruk</b> i Agder-industrien — og frigjør folk til verdiskaping.</p></div>
+    <div class="move"><div class="n">03</div><h3>Skalerbart</h3><p>Alt bygges for gjenbruk: maler, kurs og indeks skal virke <b>fra ett verksted til hele regionen</b> — og forbi den.</p></div>
+    <div class="move"><div class="n">04</div><h3>Megatrender</h3><p>AI møter Agders styrker: <b>energi, prosessindustri og hav.</b> Minst to megatrender i hvert prosjekt vi tar inn.</p></div>
+    <div class="move"><div class="n">05</div><h3>Nordisk</h3><p>Åpenhet, enkelhet og tillit — i avtaler, deling og design. <b>Verdier, ikke geografi</b> — deres egne ord.</p></div>
+  </div>
+  <div class="footline">Eierne måler porteføljen mot FNs bærekraftsmål — <b>AI House skal rapportere impact på samme språk fra dag én.</b></div>
+  <aside class="notes"><b>Dette er styring, ikke smiger.</b> Oxidane er Norsif-medlem og PRI-signatar — impactspråket er ikke pynt for dem, det er rapporteringsvirkelighet. Når AI House måler seg slik porteføljen måles, blir styrearbeidet enklere og finansieringen mer troverdig. Og «blue shift» er ikke fremmed for meg: svevestøvplattformen min er bygget for nettopp ressurs- og HMS-gevinster i industrien.</aside>
+</section>
+
+<!-- ============ SLIDE 8 · Q3: FØRSTE ÅR ============ -->
+<section class="slide" data-time="75 sek">
+  <div class="kicker"><span class="sq"></span>Spørsmål 3 · Det første året</div>
+  <h1 class="h-md">Tre spor — samtidig</h1>
+  <div class="grid cols-3" style="margin-top:28px;">
+    <div class="card">
+      <div class="lab">Spor 1</div><h3>Synlighet</h3>
+      <ul class="clean" style="margin-top:6px;">
+        <li style="font-size:14px;"><b>AI House Live</b> <span>— månedlig demokveld</span></li>
+        <li style="font-size:14px;"><b>Tankelederskap</b> <span>— kronikker, LinkedIn og blogg i fast rytme</span></li>
+        <li style="font-size:14px;"><b>Bevisst PR-løp</b> <span>— med profesjonell støtte, historier hver måned</span></li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="lab">Spor 2</div><h3>Verdiskaping</h3>
+      <ul class="clean ember-dots" style="margin-top:6px;">
+        <li style="font-size:14px;"><b>AI-verkstedet</b> <span>— sprintprosjekter med bedrifter, fra problem til løsning i drift</span></li>
+        <li style="font-size:14px;"><b>Lederprogram</b> <span>— KI for toppledere og styrer</span></li>
+        <li style="font-size:14px;"><b>Studentkraft</b> <span>— UiA-studenter inn i reelle bedriftsprosjekter</span></li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="lab">Spor 3</div><h3>Struktur</h3>
+      <ul class="clean" style="margin-top:6px;">
+        <li style="font-size:14px;"><b>Strategi vedtatt</b> <span>— med styret, og Advisory Board operativt</span></li>
+        <li style="font-size:14px;"><b>CRM og markedsmotor fra dag én</b> <span>— pipeline, nyhetsbrev, synkronisert innholdsproduksjon</span></li>
+        <li style="font-size:14px;"><b>Finansieringsmodell år 2–5</b> <span>— partneravtaler, programinntekter, virkemidler</span></li>
+      </ul>
+    </div>
+  </div>
+  <aside class="notes"><b>Q3 — logikken:</b> Synlighet skaffer bedriftene, verkstedet skaper verdien, strukturen gjør det varig. Alle tre fra start — men verdiskapingssporet er det som teller når året gjøres opp. CRM-poenget er ikke trivielt: jeg har drevet salgsorganisasjon på moderne CRM-stack og setter dette opp selv på dager, ikke måneder.</aside>
+</section>
+
+<!-- ============ SLIDE 9 · Q3: ÅRSHJULET ============ -->
+<section class="slide" data-time="45 sek">
+  <div class="kicker"><span class="sq"></span>Spørsmål 3 · Rytmen gjennom året</div>
+  <h1 class="h-md">Fire kvartaler, én retning</h1>
+  <div class="year">
+    <div class="rail"></div>
+    <div class="qrow">
+      <div class="q"><div class="when">Måned 1–3</div><h3>Lytte &amp; lansere</h3>
+        <ul class="clean"><li>50 samtaler gjennomført</li><li>Strategi med styret</li><li>Første AI House Live</li><li>Nettside og CRM live</li></ul></div>
+      <div class="q"><div class="when">Måned 4–6</div><h3>Verksted i gang</h3>
+        <ul class="clean"><li>Tre første bedrifter i sprint</li><li>Lederprogram, kull 1</li><li>Agder AI-indeksen lanseres</li><li>Advisory Board samlet</li></ul></div>
+      <div class="q"><div class="when">Måned 7–9</div><h3>Skalere</h3>
+        <ul class="clean"><li>Verksted, kull 2</li><li>Studentprosjekter med UiA</li><li>Første nordiske kobling</li><li>EU-søknad forberedes</li></ul></div>
+      <div class="q last"><div class="when">Måned 10–12</div><h3>Bevise</h3>
+        <ul class="clean"><li>Agder AI Summit</li><li>Resultatrapport: dokumentert effekt</li><li>Finansiering år 2–3 sikret</li><li>Indeks #2 planlagt</li></ul></div>
+    </div>
+  </div>
+  <aside class="notes"><b>Kort slide — la tidslinjen snakke.</b> Poengter kun: kvartal 4 heter «Bevise». Året avsluttes ikke med en fest, men med en resultatrapport som viser dokumentert effekt hos bedriftene — det er den som sikrer finansieringen videre.</aside>
+</section>
+
+<!-- ============ SLIDE 10 · Q3: FEM GREP ============ -->
+<section class="slide" data-time="75 sek">
+  <div class="kicker"><span class="sq"></span>Spørsmål 3 · Fem grep jeg tror på</div>
+  <h1 class="h-md">Signaturkonsepter</h1>
+  <div class="moves">
+    <div class="move"><div class="n">01</div><h3>Agder AI-indeksen</h3><p>Årlig måling av KI-modenheten i regionen. <b>Vi eier tallene</b> — media siterer oss, partnerne får innsikten, bedriftene får speilet.</p></div>
+    <div class="move"><div class="n">02</div><h3>48-timers sprint</h3><p>AI House + bedrift bygger en <b>fungerende prototype på to døgn.</b> Vis, ikke fortell — og bedriften eier resultatet.</p></div>
+    <div class="move"><div class="n">03</div><h3>AI House Live</h3><p>Månedlig demoscene. Regel nummer én: <b>ingen slides</b> — bare ting som virker, vist av dem som bygde det.</p></div>
+    <div class="move"><div class="n">04</div><h3>Deal flow-motoren</h3><p>Validerte problemer fra verkstedet blir muligheter for gründere og investorer. <b>Regionens beste kilde til ekte problemstillinger.</b></p></div>
+    <div class="move"><div class="n">05</div><h3>Åpen kilde</h3><p>Maler, kontrakter og erfaringsrapporter deles fritt. <b>Non-profit i praksis</b> — og det raskeste tillitsbygget som finnes.</p></div>
+  </div>
+  <aside class="notes"><b>Q3 — dette er «mulighetene jeg ser».</b> 01 gir oss medie-eierskap til KI-narrativet i Agder hvert eneste år. 02 er hentet fra hvordan jeg selv selger industriteknologi: pilot før powerpoint. 04 er bygget for dere i rommet — verkstedet blir en kvalifisert pipeline av reelle problemer som kan bli selskaper. Ironien i 03 er tilsiktet: dette er siste gang jeg viser slides.</aside>
+</section>
+
+<!-- ============ SLIDE 11 · Q4: PARTNERSKAP ============ -->
+<section class="slide" data-time="75 sek">
+  <div class="kicker"><span class="sq"></span>Spørsmål 4 · Partnerskap</div>
+  <h1 class="h-md">Tre ringer — bygget innenfra</h1>
+  <div class="grid cols-3" style="margin-top:28px;">
+    <div class="card">
+      <div class="lab">Regionalt · fundamentet</div>
+      <ul class="clean" style="margin-top:4px;">
+        <li style="font-size:14px;">UiA — CAIR, MIL og studentene</li>
+        <li style="font-size:14px;">Eyde-klyngen, GCE NODE, Digin</li>
+        <li style="font-size:14px;">Innoventus Sør</li>
+        <li style="font-size:14px;">Fylkeskommunen og kommunene</li>
+        <li style="font-size:14px;">Næringsforeningene, NHO, Tekna</li>
+        <li style="font-size:14px;">Banker, stiftelser og fond</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="lab">Nasjonalt · kraften</div>
+      <ul class="clean" style="margin-top:4px;">
+        <li style="font-size:14px;">KI Norge (Digdir) — den nasjonale arenaen</li>
+        <li style="font-size:14px;">NORA — forskningskonsortiet</li>
+        <li style="font-size:14px;">Digital Norway</li>
+        <li style="font-size:14px;">Innovasjon Norge og Forskningsrådet</li>
+        <li style="font-size:14px;">NTNU og SINTEF</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="lab">Internasjonalt · utsynet</div>
+      <ul class="clean" style="margin-top:4px;">
+        <li style="font-size:14px;">AI Sweden — modell og samarbeidspartner</li>
+        <li style="font-size:14px;">Nordiske søsterhus og nettverk</li>
+        <li style="font-size:14px;">EU — Horisont Europa og Digital Europe</li>
+      </ul>
+    </div>
+  </div>
+  <div class="footline">Dette nettverket er ikke teoretisk for meg: <b>jeg har hentet Horizon-midler, samarbeidet med NTNU, SINTEF og NORCE — og solgt til Eyde-bedriftene.</b></div>
+  <aside class="notes"><b>Q4 — rekkefølgen er poenget:</b> innenfra og ut. Uten regional forankring blir nasjonale og internasjonale partnerskap pynt. UiA/CAIR er den viktigste enkeltrelasjonen — Norges første KI-forskningssenter ligger 40 minutter unna, og jeg er allerede ekstern sensor ved NTNU, så akademia-språket sitter. AI Sweden nevnes som modell: nasjonalt senter bygget på partnerskap, ikke offentlig drift alene. Og glem ikke eiernes egen portefølje: <b>Intoto i Grimstad driver vannsensorikk — jeg snakker det språket flytende</b> og ser flere koblinger inn mot verkstedet.</aside>
+</section>
+
+<!-- ============ SLIDE 12 · Q5: SUKSESS ============ -->
+<section class="slide" data-time="75 sek">
+  <div class="kicker"><span class="sq"></span>Spørsmål 5 · Suksess etter 12 måneder</div>
+  <h1 class="h-md">Målbart — som alt annet vi gjør</h1>
+  <div class="kpis">
+    <div class="kpi"><div class="num">25</div><p>partnerbedrifter med signert avtale</p></div>
+    <div class="kpi"><div class="num">12</div><p>bedrifter gjennom AI-verkstedet</p></div>
+    <div class="kpi"><div class="num ember">≥ 5</div><p>løsninger i produksjon — med dokumentert effekt</p></div>
+    <div class="kpi"><div class="num">10 / 800+</div><p>arrangementer / deltakere — inkludert Agder AI Summit</p></div>
+    <div class="kpi"><div class="num">1.</div><p>Agder AI-indeks publisert — 10+ medieoppslag</p></div>
+    <div class="kpi"><div class="num">6–8</div><p>profiler i operativt Advisory Board</p></div>
+    <div class="kpi"><div class="num">Vedtatt</div><p>strategi — og finansiering for år 2–3 sikret</p></div>
+    <div class="kpi"><div class="num">≥ 30 %</div><p>egeninntekter i driftsplanen for år 2</p></div>
+  </div>
+  <div class="truth">Og den egentlige testen: <b>at bedriftsledere i Agder uoppfordret sier at AI House flyttet dem.</b></div>
+  <aside class="notes"><b>Q5 — tallene er hypoteser, kalibrert mot regionens størrelse.</b> Etter 30-dagerslyttingen settes de endelige målene sammen med styret. Men prinsippet står fast: vi måler oss på det samme vi krever av prosjektene — dokumentert effekt. Det røde tallet er det viktigste: løsninger i produksjon er forskjellen på et hus og en prateklubb.</aside>
+</section>
+
+<!-- ============ SLIDE 13 · VIS, IKKE FORTELL ============ -->
+<section class="slide" data-time="45 sek">
+  <div class="kicker"><span class="sq"></span>Arbeidsmåten</div>
+  <div class="preview-wrap">
+    <div>
+      <h1 class="h-md" style="margin-bottom:18px;">Denne presentasjonen er bygget med AI — på én kveld</h1>
+      <p class="sub" style="margin-top:0;">Det samme er nettsiden. Et utkast trenger ikke vente på et byrå — det trenger en ettermiddag og de riktige verktøyene.</p>
+      <p class="sub" style="margin-top:14px;"><strong>Slik skal AI House jobbe:</strong> raskt, konkret — og åpent om verktøyene, så bedriftene lærer dem av oss.</p>
+    </div>
+    <div class="browser">
+      <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url">ai-house.no — utkast</span></div>
+      <div class="bpage">
+        <div class="bnav"><span class="bm">AI-HOUSE</span><span class="links">VERKSTEDET&nbsp;&nbsp;LIVE&nbsp;&nbsp;INDEKSEN&nbsp;&nbsp;OM&nbsp;&nbsp;<b style="color:var(--pine);">BLI PARTNER</b></span></div>
+        <div class="bhero">
+          <div class="bk">Anvendt kunstig intelligens · Agder</div>
+          <h2>Fra AI-nysgjerrig<br>til AI i produksjon.</h2>
+          <p>AI House hjelper bedrifter og offentlig sektor i Agder med å ta kunstig intelligens i bruk — i praksis.</p>
+          <span class="bbtn solid">Kom på neste Live</span><span class="bbtn ghost">Start i verkstedet</span>
+        </div>
+        <div class="bcards">
+          <div class="bcard"><div class="bdot"></div><h5>AI-verkstedet</h5><p>Sprint fra problem til løsning i drift.</p></div>
+          <div class="bcard"><div class="bdot"></div><h5>AI House Live</h5><p>Månedlig demokveld. Ingen slides.</p></div>
+          <div class="bcard"><div class="bdot"></div><h5>AI-indeksen</h5><p>Årets måling av KI-Agder.</p></div>
+        </div>
+        <div style="margin-top:12px;font-size:8.5px;font-weight:600;letter-spacing:.08em;color:var(--faint);text-transform:uppercase;">Et initiativ fra Oxidane Venture · It all starts with water</div>
+      </div>
+    </div>
+  </div>
+  <aside class="notes"><b>Demonstrasjonen.</b> Hele utkastet til nettside ligger klart i nettleseren — vis det gjerne live etterpå hvis tiden tillater. Poenget er ikke at nettsider er viktig, men at <b>tempoet og arbeidsmåten</b> er det: en daglig leder for et AI-hus bør selv bygge med AI hver uke. Det gjør jeg allerede.</aside>
+</section>
+
+<!-- ============ SLIDE 14 · HVORFOR MEG ============ -->
+<section class="slide" data-time="60 sek">
+  <div class="kicker"><span class="sq"></span>Til slutt</div>
+  <h1 class="h-lg">Jeg har gjort reisen<br>bedriftene i Agder skal ut på</h1>
+  <div style="margin-top:30px;max-width:880px;">
+    <ul class="clean">
+      <li><b>Fra idé til drift:</b> <span>bygget, solgt og driftet industriell teknologi hos Elkem, Vianode, Boliden og Wacker.</span></li>
+      <li><b>Kommersiell i bunn:</b> <span>31 % hitrate på kvalifiserte leads, forretningsmodellskifte til 65 % bruttomargin.</span></li>
+      <li><b>AI-praktiker, ikke -teoretiker:</b> <span>bygger med språkmodeller og MCP i produksjon — hver uke.</span></li>
+      <li><b>Forankret her:</b> <span>bor i Lillesand. Nettverket i industrien, akademia og klyngene er allerede på plass.</span></li>
+    </ul>
+  </div>
+  <div class="footline">Ryddighet: Jeg er styreleder i Arpuro Labs. <b>Det legges åpent på bordet og håndteres ryddig med styret fra dag én.</b></div>
+  <aside class="notes"><b>Lukkingen.</b> Fire setninger, ingen nye argumenter. Arpuro-noten nevnes muntlig i én setning, proaktivt og rolig: «Før dere spør — jeg er styreleder i et sensor-selskap, og det håndterer vi med full åpenhet.» Transparens er raskere enn forklaringer.</aside>
+</section>
+
+<!-- ============ SLIDE 15 · TAKK ============ -->
+<section class="slide" id="s15" data-time="15 sek">
+  <div class="blob" style="top:-300px;right:-260px;opacity:.16;"></div>
+  <div style="display:flex;flex-direction:column;justify-content:center;height:100%;padding-bottom:30px;">
+    <div class="kicker"><span class="sq"></span>Takk</div>
+    <h1 class="h-xl">Skal vi ta<br>en kaffe?</h1>
+    <p class="sub" style="margin-top:22px;">Kaffen ordner jeg. <strong>Vannet har dere allerede.</strong></p>
+    <div class="byline" style="margin-top:36px;">Geir Kulia <span>· geir@kulia.no · 992 99 867 · Lillesand</span></div>
+    <div class="footline" style="max-width:620px;">Presentasjon og nettsideutkast bygget med AI-verktøy. <b>Juni 2026.</b></div>
+  </div>
+  <aside class="notes">Stopp klokka. Under 15 minutter. Inviter til spørsmål — og noter dem synlig. Lyttingen begynner nå.</aside>
+</section>
+
+<!-- ============ CHROME ============ -->
+<div id="chrome">
+  <div id="instrument" aria-hidden="true"><div class="rail"></div></div>
+  <div id="meta"><span><b>Geir Kulia</b> · Case daglig leder · AI House · Initiert av Oxidane Venture</span><span id="counter">01 / 16</span></div>
+</div>
+<div id="hint">←&nbsp;→&nbsp;bla&nbsp;&nbsp;·&nbsp;&nbsp;F&nbsp;fullskjerm&nbsp;&nbsp;·&nbsp;&nbsp;N&nbsp;notater</div>
+<div id="navBtns"><button id="prevB" aria-label="Forrige">‹</button><button id="nextB" aria-label="Neste">›</button></div>
+<div id="notesPanel"><div class="nt" id="noteTitle">Notater</div><div class="nb" id="noteBody"></div></div>
+
+</div>
+</div>
+
+<script>
+(function(){
+  var stage=document.getElementById('stage');
+  var slides=Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var N=slides.length, cur=0;
+  var counter=document.getElementById('counter');
+  var notesPanel=document.getElementById('notesPanel');
+  var noteBody=document.getElementById('noteBody');
+  var noteTitle=document.getElementById('noteTitle');
+  var hint=document.getElementById('hint');
+  var reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---- scale stage to viewport ---- */
+  function fit(){
+    var s=Math.min(window.innerWidth/1280, window.innerHeight/720);
+    stage.style.transform='scale('+s+')';
+  }
+  window.addEventListener('resize',fit); fit();
+
+  /* ---- instrument bar: 15 ticks, 5 question markers ---- */
+  var inst=document.getElementById('instrument');
+  var qmap={3:'S1',5:'S2',8:'S3',11:'S4',12:'S5'}; // 0-indexed slides
+  var ticks=[];
+  for(var i=0;i<N;i++){
+    var pct=(i/(N-1))*100;
+    var t=document.createElement('div');
+    t.className='tick'+(qmap[i]!==undefined?' major':'');
+    t.style.left=pct+'%';
+    inst.appendChild(t); ticks.push(t);
+    if(qmap[i]!==undefined){
+      var l=document.createElement('div');
+      l.className='tick-label'; l.style.left=pct+'%'; l.textContent=qmap[i];
+      inst.appendChild(l);
+    }
+  }
+
+  /* ---- navigation ---- */
+  function pad(n){return (n<10?'0':'')+n;}
+  function show(i){
+    i=Math.max(0,Math.min(N-1,i));
+    slides[cur].classList.remove('active');
+    cur=i;
+    slides[cur].classList.add('active');
+    counter.textContent=pad(cur+1)+' / '+pad(N);
+    ticks.forEach(function(t,j){
+      t.classList.toggle('now',j===cur);
+      t.classList.toggle('done',j<cur);
+    });
+    if(notesPanel.classList.contains('open')) loadNote();
+  }
+  function next(){show(cur+1);} function prev(){show(cur-1);}
+  document.getElementById('nextB').addEventListener('click',next);
+  document.getElementById('prevB').addEventListener('click',prev);
+
+  document.addEventListener('keydown',function(e){
+    if(e.key==='ArrowRight'||e.key===' '||e.key==='PageDown'){e.preventDefault();next();}
+    else if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();prev();}
+    else if(e.key==='Home'){show(0);}
+    else if(e.key==='End'){show(N-1);}
+    else if(e.key==='f'||e.key==='F'){toggleFS();}
+    else if(e.key==='n'||e.key==='N'){toggleNotes();}
+    else if(e.key==='Escape'){notesPanel.classList.remove('open');}
+  });
+
+  /* swipe */
+  var tx=null;
+  document.addEventListener('touchstart',function(e){tx=e.touches[0].clientX;},{passive:true});
+  document.addEventListener('touchend',function(e){
+    if(tx===null)return;
+    var dx=e.changedTouches[0].clientX-tx;
+    if(Math.abs(dx)>50){dx<0?next():prev();}
+    tx=null;
+  },{passive:true});
+
+  function toggleFS(){
+    if(!document.fullscreenElement){document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen();}
+    else{document.exitFullscreen&&document.exitFullscreen();}
+  }
+  function loadNote(){
+    var n=slides[cur].querySelector('.notes');
+    noteTitle.textContent='Notater · slide '+pad(cur+1)+' · ⏱ '+(slides[cur].getAttribute('data-time')||'');
+    noteBody.innerHTML=n?n.innerHTML:'—';
+  }
+  function toggleNotes(){
+    if(notesPanel.classList.contains('open')){notesPanel.classList.remove('open');}
+    else{loadNote();notesPanel.classList.add('open');}
+  }
+
+  setTimeout(function(){hint.classList.add('faded');},6000);
+
+  show(0);
+})();
+</script>
+</body>
+</html>
